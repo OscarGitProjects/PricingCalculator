@@ -50,6 +50,9 @@ namespace PricingCalculator.Repository
         /// <exception cref="System.ArgumentNullException">Metoden kan kasta argument null exception</exception>
         public Customer GetCustomer(int iCustomerId)
         {
+            if (m_lsCustomers == null || m_lsCustomers.Count <= 0)
+                return null;
+
             return m_lsCustomers.Where(c => c.CustomerId == iCustomerId).FirstOrDefault();
         }
     }

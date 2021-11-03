@@ -23,6 +23,24 @@ namespace PricingCalculator.Services
             this.m_CustomerRepository = CustomerRepository;
         }
 
+        /// <summary>
+        /// Metoden skapar önskat antal kunder
+        /// </summary>
+        /// <param name="numberOfCostumers">Antal kunder som skall skapas</param>
+        public void CreateCustomers(int iNumberOfCustomers)
+        {
+            Customer newCustomer = null;
+
+            for(int i = 1; i <= iNumberOfCustomers; i++)
+            {
+                newCustomer = new Customer(i, "Customer " + i);
+
+                // TODO
+
+                this.m_CustomerRepository.AddCustomer(newCustomer);
+            }
+        }
+
 
         /// <summary>
         /// Metoden hämtar sökt customer från repository

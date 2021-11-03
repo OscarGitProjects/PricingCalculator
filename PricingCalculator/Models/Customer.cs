@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PricingCalculator.Models
 {
@@ -17,7 +14,56 @@ namespace PricingCalculator.Models
         public DateTime StartDateServiceC { get; set; }
         public int NumberOfFreeDays { get; set; }
 
+        /// <summary>
+        /// Property som returnerar true om användaren kan använda service a
+        /// Annars returneras false
+        /// </summary>
+        public bool CanUseServiceA { 
+            get { 
+                if(StartDateServiceA.Date <= DateTime.Now.Date)
+                    return true;
 
+                return false;
+            } 
+        }
+
+
+        /// <summary>
+        /// Property som returnerar true om användaren kan använda service b
+        /// Annars returneras false
+        /// </summary>
+        public bool CanUseServiceB
+        {
+            get
+            {
+                if (StartDateServiceB.Date <= DateTime.Now.Date)
+                    return true;
+
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Property som returnerar true om användaren kan använda service c
+        /// Annars returneras false
+        /// </summary>
+        public bool CanUseServiceC
+        {
+            get
+            {
+                if (StartDateServiceC.Date <= DateTime.Now.Date)
+                    return true;
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Konstruktor
+        /// </summary>
+        /// <param name="iCustomerId">CustomerId</param>
+        /// <param name="strCustomerName">CustomerName</param>
         public Customer(int iCustomerId, string strCustomerName)
         {
             CustomerId = iCustomerId;

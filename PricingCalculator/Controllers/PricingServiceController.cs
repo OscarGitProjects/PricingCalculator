@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PricingCalculator.Models;
 using PricingCalculator.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -41,52 +39,30 @@ namespace PricingCalculator.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
-        /// <response code="200">TODO</response>
+        /// <returns>Pris</returns>        
+        /// <response code="200">Ok och priset returneras</response>
+        /// <response code="403">Returneras om customer inte kan använda servisen</response>
+        /// <response code="404">Returneras om customer med sökt customer id inte finns</response>
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [HttpGet("ServiceA/{customerId}/{startDate}/{endDate}")]
         public async Task<ActionResult<string>> ServiceC(int customerId, DateTime startDate, DateTime endDate)
         {
+            m_CustomerService.CreateCustomers(5);
             Customer customer = m_CustomerService.GetCustomer(customerId);
+            if (customer == null)
+                return NotFound($"Hittade inte customer med id {customerId}");
 
-            // TODO KONTROLLERA ATT KUNDEN HAR TILLGÅNG TILL SERVICE
-
-            double price = m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_C, customer, startDate, endDate);
-
-            return Ok(price.ToString());
-        }
-
-
-        // GET: api/<PricingServiceController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<PricingServiceController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<PricingServiceController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<PricingServiceController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<PricingServiceController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            if (customer.CanUseServiceC)
+            {
+                double price = m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_C, customer, startDate, endDate);
+                return Ok(price.ToString());
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
         }
     }
 }
