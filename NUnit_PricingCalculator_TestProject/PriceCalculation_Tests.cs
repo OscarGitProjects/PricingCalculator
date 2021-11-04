@@ -92,7 +92,8 @@ namespace NUnit_PricingCalculator_TestProject
             Customer customer = new Customer(1, "Test ett");
             DateTime dtStartDate = DateTime.Now;
             DateTime dtEndDate = DateTime.Now;
-            customer.DiscountInPercentForServiceC = 0.0;
+            customer.DiscountForServiceC = new Discount();
+            //customer.DiscountInPercentForServiceC = 0.0;
             customer.NumberOfFreeDays = 0;
 
             // Act
@@ -115,7 +116,8 @@ namespace NUnit_PricingCalculator_TestProject
             Customer customer = new Customer(1, "Test ett");
             DateTime dtStartDate = DateTime.Now.AddDays(-2);
             DateTime dtEndDate = DateTime.Now;
-            customer.DiscountInPercentForServiceC = 0.0;
+            customer.DiscountForServiceC = new Discount();
+            //customer.DiscountInPercentForServiceC = 0.0;
             customer.NumberOfFreeDays = 0;
 
             // Act
@@ -138,7 +140,8 @@ namespace NUnit_PricingCalculator_TestProject
             Customer customer = new Customer(1, "Test ett");
             DateTime dtStartDate = DateTime.Now.AddDays(-2);
             DateTime dtEndDate = DateTime.Now;
-            customer.DiscountInPercentForServiceC = 0.0;
+            customer.DiscountForServiceC = new Discount();
+            //customer.DiscountInPercentForServiceC = 0.0;
             customer.NumberOfFreeDays = 1;
 
             // Act
@@ -161,7 +164,8 @@ namespace NUnit_PricingCalculator_TestProject
             Customer customer = new Customer(1, "Test ett");
             DateTime dtStartDate = DateTime.Now.AddDays(-2);
             DateTime dtEndDate = DateTime.Now;
-            customer.DiscountInPercentForServiceC = 0.0;
+            customer.DiscountForServiceC = new Discount();
+            //customer.DiscountInPercentForServiceC = 0.0;
             customer.NumberOfFreeDays = 2;
 
             // Act
@@ -184,7 +188,9 @@ namespace NUnit_PricingCalculator_TestProject
             Customer customer = new Customer(1, "Test ett");
             DateTime dtStartDate = DateTime.Now.AddDays(-2);
             DateTime dtEndDate = DateTime.Now;
-            customer.DiscountInPercentForServiceC = 0.0;
+
+            customer.DiscountForServiceC = new Discount();
+            //customer.DiscountInPercentForServiceC = 0.0;
             customer.NumberOfFreeDays = 3;
 
             // Act
@@ -208,7 +214,12 @@ namespace NUnit_PricingCalculator_TestProject
             Customer customer = new Customer(1, "Test ett");
             DateTime dtStartDate = DateTime.Now.AddDays(-2);
             DateTime dtEndDate = DateTime.Now;
-            customer.DiscountInPercentForServiceC = 10.0;
+            
+            Discount discount = new Discount();
+            discount.DiscountInPercent = 10.0;
+            discount.HasDiscount = true;
+
+            customer.DiscountForServiceC = discount;
             customer.NumberOfFreeDays = 0;
 
             // Act
@@ -216,7 +227,7 @@ namespace NUnit_PricingCalculator_TestProject
             double dblActualPrice = this.m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_C, customer, dtStartDate, dtEndDate);
 
             // Assert
-            Assert.AreEqual(0.8 * (double)(1.0 - (customer.DiscountInPercentForServiceC / 100.0)), dblActualPrice);
+            Assert.AreEqual(0.8 * (double)(1.0 - (customer.DiscountForServiceC.DiscountInPercent / 100.0)), dblActualPrice);
         }
 
 
@@ -231,7 +242,14 @@ namespace NUnit_PricingCalculator_TestProject
             Customer customer = new Customer(1, "Test ett");
             DateTime dtStartDate = DateTime.Now.AddDays(-2);
             DateTime dtEndDate = DateTime.Now;
-            customer.DiscountInPercentForServiceC = 10.0;
+
+            Discount discount = new Discount();
+            discount.DiscountInPercent = 10.0;
+            discount.HasDiscount = true;
+
+            customer.DiscountForServiceC = discount;
+
+            //customer.DiscountInPercentForServiceC = 10.0;
             customer.NumberOfFreeDays = 1;
 
             // Act
@@ -239,7 +257,7 @@ namespace NUnit_PricingCalculator_TestProject
             double dblActualPrice = this.m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_C, customer, dtStartDate, dtEndDate);
 
             // Assert
-            Assert.AreEqual(0.4 * (double)(1.0 - (customer.DiscountInPercentForServiceC / 100.0)), dblActualPrice);
+            Assert.AreEqual(0.4 * (double)(1.0 - (customer.DiscountForServiceC.DiscountInPercent / 100.0)), dblActualPrice);
         }
 
 
