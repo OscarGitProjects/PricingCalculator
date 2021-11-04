@@ -2,6 +2,7 @@
 using PricingCalculator.Exceptions;
 using PricingCalculator.Models;
 using System;
+using PricingCalculator.Extensions;
 
 namespace PricingCalculator.Services
 {
@@ -248,7 +249,7 @@ namespace PricingCalculator.Services
                 if (customer.DiscountForServiceC.HasDiscountForAPeriod)
                 {// Kunden har rabatt under en period. Kontrollera hur många av dagarna som är inom perioden
 
-                    int iNumberOfDaysInPeriod = CalculateNumberOfDaysInPeriod(customer, startDate, endDate);
+                    int iNumberOfDaysInPeriod = CalculateNumberOfDaysInPeriodForService(customer, startDate, endDate, false);
 
                     if (iNumberOfDaysInPeriod > 0)
                     {// Kunden har rabatt för några dagar
@@ -280,11 +281,68 @@ namespace PricingCalculator.Services
         }
 
 
-        private int CalculateNumberOfDaysInPeriod(Customer customer, DateTime startDate, DateTime endDate)
+        /// <summary>
+        /// Metoden beräknar hur många arbetsdagar dvs. måndag till fredag som det är mellan startdatum och slutdatum
+        /// </summary>
+        /// <param name="startDate">Startdatum</param>
+        /// <param name="endDate">Slutdatum</param>
+        /// <returns>Antalet dagar mellan startdatum och slutdatum. Vi räknar bara veckodagar dvs måndag till och med fredag</returns>
+        /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
+        private int CalculateNumberOfWorkDaysForService(DateTime startDate, DateTime endDate)
         {
-            // TODO
+            if (startDate > endDate)
+                throw new ArgumentException("PriceCalculateService->CalculateNumberOfWorkDaysForService(). StartDatum är inte före slutdatum");
 
-            throw new NotImplementedException();
+            int iNumberOfWorkDays = 0;
+
+            int iDays = (endDate.Date - startDate.Date).Days;
+            DateTime dtTmp = startDate;
+            for (int i = 0; i < iDays; i++)
+            {
+                dtTmp = dtTmp.AddDays(1);
+
+                if (dtTmp.IsWorkDay())
+                    iNumberOfWorkDays++;
+            }
+
+
+            return iNumberOfWorkDays;
+        }
+
+
+        /// <summary>
+        /// Kontrollera hur många av dagarna som är inom perioden för rabatt. Den perioden finns i customer objektet
+        /// </summary>
+        /// <param name="customer">Customer</param>
+        /// <param name="startDate">Startdatum</param>
+        /// <param name="endDate">Slutdatum</param>
+        /// <param name="bOnlyWeekDays">true om vi bara skall räkna måndag till och med fredag. false innebär att vi räknar alla veckans dagar. default false</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
+        /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
+        private int CalculateNumberOfDaysInPeriodForService(Customer customer, DateTime startDate, DateTime endDate, bool bOnlyWeekDays = false)
+        {
+            int iNumberOfDays = 0;
+
+            if (customer == null)
+                throw new ArgumentNullException("PriceCalculateService->CalculateNumberOfDaysInPeriodForService(). Referensen till customer är null");
+
+            if (startDate > endDate)
+                throw new ArgumentException("PriceCalculateService->CalculateNumberOfDaysInPeriodForService(). StartDatum är inte före slutdatum");
+
+
+            // TODO
+            if (bOnlyWeekDays)
+            {// Räkna bara veckodagar dvs måndag till fredag
+
+            }
+            else
+            {// Räkna alla dagar i veckan
+
+            }
+
+
+            return iNumberOfDays;
         }
     }
 }
