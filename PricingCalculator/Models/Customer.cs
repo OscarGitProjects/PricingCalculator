@@ -6,13 +6,21 @@ namespace PricingCalculator.Models
     {
         public int CustomerId { get; set; }
         public string CustomerName { get; set; }
-        public double DiscountInPercentForServiceA { get; set; }
-        public double DiscountInPercentForServiceB { get; set; }
-        public double DiscountInPercentForServiceC { get; set; }
+        
         public DateTime StartDateServiceA { get; set; }
         public DateTime StartDateServiceB { get; set; }
-        public DateTime StartDateServiceC { get; set; }
+        public DateTime StartDateServiceC { get; set; }  
+        
+        public Discount DiscountForServiceA { get; set; }
+        public Discount DiscountForServiceB { get; set; }
+        public Discount DiscountForServiceC { get; set; }
+        
+        public CostForService CostForServiceA { get; set; }
+        public CostForService CostForServiceB { get; set; }
+        public CostForService CostForServiceC { get; set; }
+
         public int NumberOfFreeDays { get; set; }
+
 
         /// <summary>
         /// Property som returnerar true om användaren kan använda service a
@@ -59,6 +67,7 @@ namespace PricingCalculator.Models
             }
         }
 
+
         /// <summary>
         /// Konstruktor
         /// </summary>
@@ -68,6 +77,17 @@ namespace PricingCalculator.Models
         {
             CustomerId = iCustomerId;
             CustomerName = strCustomerName;
+
+            // Sätt lite startvärden
+            DiscountForServiceA = new Discount();
+            DiscountForServiceB = new Discount();
+            DiscountForServiceC = new Discount();
+
+            StartDateServiceA = DateTime.Now.AddYears(1);
+            StartDateServiceB = DateTime.Now.AddYears(1);
+            StartDateServiceC = DateTime.Now.AddYears(1);
+
+            NumberOfFreeDays = 0;
         }
 
 

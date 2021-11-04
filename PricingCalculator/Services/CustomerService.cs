@@ -36,6 +36,7 @@ namespace PricingCalculator.Services
                 newCustomer = new Customer(i, "Customer " + i);
 
                 // TODO
+                // Man ska kunna ha rabatt mellan datum. Ändra i koden
 
                 this.m_CustomerRepository.AddCustomer(newCustomer);
             }
