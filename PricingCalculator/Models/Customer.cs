@@ -2,6 +2,9 @@
 
 namespace PricingCalculator.Models
 {
+    /// <summary>
+    /// Information om en customer
+    /// </summary>
     public class Customer
     {
         public int CustomerId { get; set; }
@@ -21,6 +24,18 @@ namespace PricingCalculator.Models
 
         public int NumberOfFreeDays { get; set; }
 
+        /// <summary>
+        /// Property som returnerar true om användaren har några gratis dagar
+        /// Annars returneras false
+        /// </summary>
+        public bool HasFreeDays {
+            get {
+                if (NumberOfFreeDays > 0)
+                    return true;
+
+                return false;
+            }
+        }
 
         /// <summary>
         /// Property som returnerar true om användaren kan använda service a
@@ -82,6 +97,10 @@ namespace PricingCalculator.Models
             DiscountForServiceA = new Discount();
             DiscountForServiceB = new Discount();
             DiscountForServiceC = new Discount();
+
+            CostForServiceA = new CostForService();
+            CostForServiceB = new CostForService();
+            CostForServiceC = new CostForService();
 
             StartDateServiceA = DateTime.Now.AddYears(1);
             StartDateServiceB = DateTime.Now.AddYears(1);
