@@ -123,8 +123,6 @@ namespace PricingCalculator.Services
             double dblCost = 0.0;
             double dblBaseCost = 0.0;
             int iDays = 0;
-            string strServiceBaseCost = String.Empty;
-            bool bBaseCostIsValid = false;
 
             // TODO Gör klart Service A
             // Hämta baskostnaden för att använda servicen
@@ -134,14 +132,64 @@ namespace PricingCalculator.Services
             }
             else
             {// Vi hämtar baskostnaden från appsettings.json filen
-                strServiceBaseCost = m_Config.GetValue<string>("ServiceBaseCost:ServiceA");
-                bBaseCostIsValid = Double.TryParse(strServiceBaseCost, out dblBaseCost);
+                string strServiceBaseCost = m_Config.GetValue<string>("ServiceBaseCost:ServiceA");
+                bool bBaseCostIsValid = Double.TryParse(strServiceBaseCost, out dblBaseCost);
 
                 if (bBaseCostIsValid == false || String.IsNullOrWhiteSpace(strServiceBaseCost))
                     throw new InvalidServiceBaseCostInAppsettingsException("PriceCalculateService->CalculatePriceForServiceA(). ServiceBaseCost:ServiceA isnt valid");
             }
 
-            return dblBaseCost;
+            if (startDate.Date == endDate.Date)
+                iDays = 1;
+            else
+                iDays = (endDate.Date - startDate.Date).Days;
+
+            if (customer.HasFreeDays)
+                iDays = iDays - customer.NumberOfFreeDays;
+
+            if (iDays <= 0)// Vi har inga dagar som vi ska beräkna kostnader för
+                return dblCost;
+
+
+            dblCost = dblBaseCost * Double.Parse(iDays.ToString());
+
+            if (customer.DiscountForServiceA.HasDiscount)
+            {// Kunden har rabatt på service a
+
+                if (customer.DiscountForServiceA.HasDiscountForAPeriod)
+                {// Kunden har rabatt under en period
+
+                    // Kontrollera hur många av dagarna som är inom perioden
+                    int iNumberOfDaysInPeriod = CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_A, startDate, endDate, true);
+
+                    if (iNumberOfDaysInPeriod > 0)
+                    {// Kunden har rabatt för några dagar
+
+                        // Rabatterad kostnad
+                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberOfDaysInPeriod).ToString());
+                        dblCostWithDiscount = dblCostWithDiscount * (double)(1.0 - (double)(customer.DiscountForServiceA.DiscountInPercent / Double.Parse("100,0")));
+
+                        if (iDays > iNumberOfDaysInPeriod)
+                        {// Det finns dagar som kunden inte skall ha rabatt för
+
+                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberOfDaysInPeriod).ToString());
+                            dblCost = dblCostWithDiscount + dblCostNoDiscount;
+                        }
+                        else
+                        {
+                            dblCost = dblCostWithDiscount;
+                        }
+                    }
+                    // Om kunden inte har rabatt under en period, så har vi redan beräknat kostnaden
+                }
+                else
+                {// Kunden har alltid rabatt
+
+                    dblCost = dblCost * (double)(1.0 - (double)(customer.DiscountForServiceA.DiscountInPercent / Double.Parse("100,0")));
+                }
+            }
+
+            return dblCost;
         }
 
 
@@ -165,8 +213,6 @@ namespace PricingCalculator.Services
             double dblCost = 0.0;
             double dblBaseCost = 0.0;
             int iDays = 0;
-            string strServiceBaseCost = String.Empty;
-            bool bBaseCostIsValid = false;
 
             // TODO Gör klart Service B
             // Hämta baskostnaden för att använda servicen
@@ -176,14 +222,65 @@ namespace PricingCalculator.Services
             }
             else
             {// Vi hämtar baskostnaden från appsettings.json filen
-                strServiceBaseCost = m_Config.GetValue<string>("ServiceBaseCost:ServiceB");
-                bBaseCostIsValid = Double.TryParse(strServiceBaseCost, out dblBaseCost);
+                string strServiceBaseCost = m_Config.GetValue<string>("ServiceBaseCost:ServiceB");
+                bool bBaseCostIsValid = Double.TryParse(strServiceBaseCost, out dblBaseCost);
 
                 if (bBaseCostIsValid == false || String.IsNullOrWhiteSpace(strServiceBaseCost))
                     throw new InvalidServiceBaseCostInAppsettingsException("PriceCalculateService->CalculatePriceForServiceB(). ServiceBaseCost:ServiceB isnt valid");
             }
 
-            return dblBaseCost;
+
+            if (startDate.Date == endDate.Date)
+                iDays = 1;
+            else
+                iDays = (endDate.Date - startDate.Date).Days;
+
+            if (customer.HasFreeDays)
+                iDays = iDays - customer.NumberOfFreeDays;
+
+            if (iDays <= 0)// Vi har inga dagar som vi ska beräkna kostnader för
+                return dblCost;
+
+
+            dblCost = dblBaseCost * Double.Parse(iDays.ToString());
+
+            if (customer.DiscountForServiceB.HasDiscount)
+            {// Kunden har rabatt på service b
+
+                if (customer.DiscountForServiceB.HasDiscountForAPeriod)
+                {// Kunden har rabatt under en period
+
+                    // Kontrollera hur många av dagarna som är inom perioden
+                    int iNumberOfDaysInPeriod = CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_B, startDate, endDate, true);
+
+                    if (iNumberOfDaysInPeriod > 0)
+                    {// Kunden har rabatt för några dagar
+
+                        // Rabatterad kostnad
+                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberOfDaysInPeriod).ToString());
+                        dblCostWithDiscount = dblCostWithDiscount * (double)(1.0 - (double)(customer.DiscountForServiceB.DiscountInPercent / Double.Parse("100,0")));
+
+                        if (iDays > iNumberOfDaysInPeriod)
+                        {// Det finns dagar som kunden inte skall ha rabatt för
+
+                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberOfDaysInPeriod).ToString());
+                            dblCost = dblCostWithDiscount + dblCostNoDiscount;
+                        }
+                        else
+                        {
+                            dblCost = dblCostWithDiscount;
+                        }
+                    }
+                    // Om kunden inte har rabatt under en period, så har vi redan beräknat kostnaden
+                }
+                else
+                {// Kunden har alltid rabatt
+
+                    dblCost = dblCost * (double)(1.0 - (double)(customer.DiscountForServiceB.DiscountInPercent / Double.Parse("100,0")));
+                }
+            }
+
+            return dblCost;
         }
 
 
@@ -208,8 +305,6 @@ namespace PricingCalculator.Services
             double dblCost = 0.0;
             double dblBaseCost = 0.0;
             int iDays = 0;
-            string strServiceBaseCost = String.Empty;
-            bool bBaseCostIsValid = false;
 
             // Hämta baskostnaden för att använda servicen
             if (customer.CostForServiceC.HasItsOwnCostForService)
@@ -218,8 +313,8 @@ namespace PricingCalculator.Services
             }
             else
             {// Vi hämtar baskostnaden från appsettings.json filen
-                strServiceBaseCost = m_Config.GetValue<string>("ServiceBaseCost:ServiceC");
-                bBaseCostIsValid = Double.TryParse(strServiceBaseCost, out dblBaseCost);
+                string strServiceBaseCost = m_Config.GetValue<string>("ServiceBaseCost:ServiceC");
+                bool bBaseCostIsValid = Double.TryParse(strServiceBaseCost, out dblBaseCost);
 
                 if (bBaseCostIsValid == false || String.IsNullOrWhiteSpace(strServiceBaseCost))
                     throw new InvalidServiceBaseCostInAppsettingsException("PriceCalculateService->CalculatePrice(). ServiceBaseCost:ServiceC isnt valid");
