@@ -21,5 +21,24 @@ namespace PricingCalculator.Extensions
 
             return bIsWorkDay;
         }
+
+
+        /// <summary>
+        /// Metoden kontrollerar att datumets veckodag, dvs DateTime.Now.Day, är inom intervallet dtStartDate och dtEndDate. 
+        /// Inkluderar dtStartDate och dtEndDate
+        /// </summary>
+        /// <param name="dtDate">Datum som vi vill kontrollera om det är inom intervallet</param>
+        /// <param name="dtStartDate">Startdatum för intervallet. Kontroll inklusive datumet</param>
+        /// <param name="dtEndDate">Slutdatum för intervallet. Kontroll inklusive datumet</param>
+        /// <returns>true om datumet är inom intervallet. Annars returneras false</returns>
+        public static bool IsInRange(this DateTime dtDate, DateTime dtStartDate, DateTime dtEndDate)
+        {            
+            bool bIsInRange = false;
+
+            if (dtDate.Day >= dtStartDate.Day && dtDate.Day <= dtEndDate.Day)
+                bIsInRange = true;
+
+            return bIsInRange;
+        }
     }
 }
