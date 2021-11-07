@@ -243,8 +243,9 @@ namespace PricingCalculator.Services
             {// Kunden har rabatt på service c
 
                 if (customer.DiscountForServiceC.HasDiscountForAPeriod)
-                {// Kunden har rabatt under en period. Kontrollera hur många av dagarna som är inom perioden
+                {// Kunden har rabatt under en period
 
+                    // Kontrollera hur många av dagarna som är inom perioden
                     int iNumberOfDaysInPeriod = CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_C, startDate, endDate, false);
 
                     if (iNumberOfDaysInPeriod > 0)
@@ -265,6 +266,7 @@ namespace PricingCalculator.Services
                             dblCost = dblCostWithDiscount;
                         }
                     }
+                    // Om kunden inte har rabatt under en period, så har vi redan beräknat kostnaden
                 }
                 else
                 {// Kunden har alltid rabatt
@@ -292,14 +294,14 @@ namespace PricingCalculator.Services
             int iNumberOfWorkDays = 0;
 
             int iDays = (endDate.Date - startDate.Date).Days;
-            DateTime dtTmp = startDate;
+            DateTime dtTmpDate = startDate;
 
             for (int i = 0; i < iDays; i++)
-            {
-                dtTmp = dtTmp.AddDays(1);
-
-                if (dtTmp.IsWorkDay())
+            {               
+                if (dtTmpDate.IsWorkDay())
                     iNumberOfWorkDays++;
+
+                dtTmpDate = dtTmpDate.AddDays(1);
             }
 
             return iNumberOfWorkDays;
@@ -343,35 +345,34 @@ namespace PricingCalculator.Services
 
             if (discount != null)
             {
-                if(discount.StartDate.Date >= startDate.Date && discount.StartDate.Date <= endDate)
-                {// Rabattens Startdate är inom intervallet
+                if((discount.StartDate.Date >= startDate.Date && discount.StartDate.Date <= endDate) || 
+                    (discount.EndDate.Date >= startDate && discount.EndDate.Date <= endDate))
+                {// Rabattens Startdate är inom intervallet eller Rabattens Slutdate är inom intervallet
 
-                    // TODO Gör klart CalculateNumberOfDaysInPeriodForService
-                    if (bOnlyWeekDays)
-                    {// Räkna bara veckodagar dvs måndag till fredag
+                    int iDays = (discount.EndDate.Date - discount.StartDate.Date).Days;
+                    DateTime dtTmpDiscountDate = discount.StartDate;
 
-                        // https://extensionmethod.net/csharp/datetime/intersects
-                        // DateTime.Now.IsInRange(dtStartDate, dtEndDate);
-                        // DateTime.Now.IsWorkDay
+                    for (int i = 0; i < iDays; i++)
+                    {
+                        if (bOnlyWeekDays)
+                        {// Räkna bara veckodagar dvs måndag till fredag
 
-                    }
-                    else
-                    {// Räkna alla dagar i veckan
+                            // https://extensionmethod.net/csharp/datetime/intersects
+                            // DateTime.Now.IsInRange(dtStartDate, dtEndDate);
+                            // DateTime.Now.IsWorkDay
+                            // iNumberOfDays
 
-                    }
-                }
-                else if(discount.EndDate.Date >= startDate && discount.EndDate.Date <= endDate)
-                {// Rabattens Slutdate är inom intervallet
-                 // TODO Gör klart CalculateNumberOfDaysInPeriodForService
-                    if (bOnlyWeekDays)
-                    {// Räkna bara veckodagar dvs måndag till fredag
+                            if (dtTmpDiscountDate.IsInRange(startDate, endDate) && dtTmpDiscountDate.IsWorkDay())
+                                iNumberOfDays++;
+                        }
+                        else
+                        {// Räkna alla dagar i veckan
 
-                        // https://extensionmethod.net/csharp/datetime/intersects
+                            if (dtTmpDiscountDate.IsInRange(startDate, endDate))
+                                iNumberOfDays++;
+                        }
 
-                    }
-                    else
-                    {// Räkna alla dagar i veckan
-
+                        dtTmpDiscountDate = dtTmpDiscountDate.AddDays(1);
                     }
                 }
             }
