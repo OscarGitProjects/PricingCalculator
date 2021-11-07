@@ -8,5 +8,10 @@
     {
         public double Cost { get; set; }
         public bool HasItsOwnCostForService { get; set; } = false;
+
+        public override string ToString()
+        {
+            return $"Cost: {Cost}, HasItsOwnCostForService: {HasItsOwnCostForService}";
+        }
     }
 }

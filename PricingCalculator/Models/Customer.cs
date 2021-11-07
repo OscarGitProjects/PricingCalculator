@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace PricingCalculator.Models
 {
@@ -112,9 +113,22 @@ namespace PricingCalculator.Models
 
         public override string ToString()
         {
-            // TODO 
+            StringBuilder strBuild = new StringBuilder();
+            strBuild.AppendLine($"CustomerId: {CustomerId}, CustomerName: {CustomerName}");
 
-            return "CustomerId: " + CustomerId + ", CustomerName: " + CustomerName;
+            strBuild.AppendLine($"NumberOfFreeDays: {NumberOfFreeDays}");
+
+            strBuild.AppendLine($"StartDateServiceA: {StartDateServiceA.ToShortDateString()}, StartDateServiceB: {StartDateServiceB.ToShortDateString()}, StartDateServiceC: {StartDateServiceC.ToShortDateString()}");
+
+            strBuild.AppendLine("DiscountForServiceA: " + DiscountForServiceA);
+            strBuild.AppendLine("DiscountForServiceB: " + DiscountForServiceB);
+            strBuild.AppendLine("DiscountForServiceC: " + DiscountForServiceC);
+
+            strBuild.AppendLine("CostForServiceA: " + CostForServiceA);
+            strBuild.AppendLine("CostForServiceB: " + CostForServiceB);
+            strBuild.AppendLine("CostForServiceC: " + CostForServiceC);
+
+            return strBuild.ToString();
         }
     }
 }
