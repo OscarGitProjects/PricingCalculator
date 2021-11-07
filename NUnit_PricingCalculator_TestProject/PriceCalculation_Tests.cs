@@ -303,6 +303,46 @@ namespace NUnit_PricingCalculator_TestProject
             Assert.AreEqual(0, iActualNumberOfDays);
         }
 
+
+        /// <summary>
+        /// Test kontrollerar antal arbetsdagar är 2. Datum är från lördag 2021-11-06 till tisdag 2021-11-09
+        /// </summary>
+        [Test]
+        public void PriceCalculateService_CalculateNumberOfWorkDaysForService_Dates_Is_saturday_to_tuesday_Test()
+        {
+            // Arrange
+            // expected
+            DateTime dtStartDate = new DateTime(2021, 11, 06);  // Lördag
+            DateTime dtEndDate = new DateTime(2021, 11, 09);    // tisdag
+
+            // Act
+            // actual
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfWorkDaysForService(dtStartDate, dtEndDate);
+
+            // Assert
+            Assert.AreEqual(2, iActualNumberOfDays);
+        }
+
+
+        /// <summary>
+        /// Test kontrollerar antal arbetsdagar är 0. Datum är från lördag 2021-11-06 till söndag 2021-11-07
+        /// </summary>
+        [Test]
+        public void PriceCalculateService_CalculateNumberOfWorkDaysForService_Dates_Is_saturday_and_sunday_Test()
+        {
+            // Arrange
+            // expected
+            DateTime dtStartDate = new DateTime(2021, 11, 06);  // Lördag
+            DateTime dtEndDate = new DateTime(2021, 11, 07);    // Söndag
+
+            // Act
+            // actual
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfWorkDaysForService(dtStartDate, dtEndDate);
+
+            // Assert
+            Assert.AreEqual(0, iActualNumberOfDays);
+        }
+
         #endregion // End of Region Test av metoden CalculateNumberOfWorkDaysForService
     }
 }
