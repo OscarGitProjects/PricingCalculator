@@ -5,7 +5,7 @@ using System;
 
 namespace NUnit_PricingCalculator_TestProject
 {
-    public class PriceCalculator_CalculateNumberOfDaysInPeriodForService_Tests : PricingCalculator_TestBase
+    public class PriceCalculator_CalculateNumberOfDiscountedDaysInPeriodForService_Tests : PricingCalculator_TestBase
     {
         [OneTimeSetUp]
         public void TestSetup()
@@ -20,13 +20,13 @@ namespace NUnit_PricingCalculator_TestProject
         }
 
 
-        #region Test av metoden CalculateNumberOfDaysInPeriodForService
+        #region Test av metoden CalculateNumberOfDiscountedDaysInPeriodForService
 
         /// <summary>
         /// Test kontrollerar att ArgumentNullException kastas om referensen till Customer objektet är null
         /// </summary>
         [Test]
-        public void PriceCalculateService_CalculateNumberOfDaysInPeriodForService_Customer_Referense_null_Test()
+        public void PriceCalculateService_CalculateNumberOfDiscountedDaysInPeriodForService_Customer_Referense_null_Test()
         {
             // Arrange
             // expected
@@ -36,7 +36,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            Assert.Throws<ArgumentNullException>(() => this.m_PriceCalculateService.CalculateNumberOfDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
+            Assert.Throws<ArgumentNullException>(() => this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
 
             // Assert
         }
@@ -46,7 +46,7 @@ namespace NUnit_PricingCalculator_TestProject
         /// Test kontrollerar att ArgumentException kastas om startdatum är efter slutdatum
         /// </summary>
         [Test]
-        public void PriceCalculateService_CalculateNumberOfDaysInPeriodForService_StartDate_After_EndDate_Test()
+        public void PriceCalculateService_CalculateNumberOfDiscountedDaysInPeriodForService_StartDate_After_EndDate_Test()
         {
             // Arrange
             // expected
@@ -56,7 +56,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculateNumberOfDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
+            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
 
             // Assert
         }
@@ -66,7 +66,7 @@ namespace NUnit_PricingCalculator_TestProject
         /// Test kontrollerra att ArgumentException kastas om CallingService är satt till CallingService.NA
         /// </summary>
         [Test]
-        public void PriceCalculateService_CalculateNumberOfDaysInPeriodForService_CallingService_Not_Set_Test()
+        public void PriceCalculateService_CalculateNumberOfDiscountedDaysInPeriodForService_CallingService_Not_Set_Test()
         {
             // Arrange
             // expected
@@ -76,7 +76,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculateNumberOfDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
+            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
 
             // Assert
         }
@@ -86,7 +86,7 @@ namespace NUnit_PricingCalculator_TestProject
         /// Test kontrollerar att vi får tillbaka 0 dagar i perioden om vi inte har rabatter
         /// </summary>
         [Test]
-        public void PriceCalculateService_CalculateNumberOfDaysInPeriodForService_NumberOfDays_0_When_No_Discount_Test()
+        public void PriceCalculateService_CalculateNumberOfDiscountedDaysInPeriodForService_NumberOfDays_0_When_No_Discount_Test()
         {
             // Arrange
             // expected
@@ -100,7 +100,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate);
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate);
 
             // Assert
             Assert.AreEqual(iExpectedNumberOfDays, iActualNumberOfDays);
@@ -111,7 +111,7 @@ namespace NUnit_PricingCalculator_TestProject
         /// Test kontrollerar att vi får tillbaka korrekt antal dagar för en rabatt period. Då räknar vi alla dagar i veckan
         /// </summary>
         [Test]
-        public void PriceCalculateService_CalculateNumberOfDaysInPeriodForService_Discount_NumberOfDays_7_When_Counting_All_Days_In_Period_Test()
+        public void PriceCalculateService_CalculateNumberOfDiscountedDaysInPeriodForService_Discount_NumberOfDays_7_When_Counting_All_Days_In_Period_Test()
         {
             // Arrange
             // expected
@@ -128,7 +128,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, false);
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, false);
 
             // Assert
             Assert.AreEqual(iExpectedNumberOfDays, iActualNumberOfDays);
@@ -139,7 +139,7 @@ namespace NUnit_PricingCalculator_TestProject
         /// Test kontrollerar att vi får tillbaka korrekt antal dagar för en rabatt period. Då räknar vi bara arbetsdagar dvs ej lördag och söndag
         /// </summary>
         [Test]
-        public void PriceCalculateService_CalculateNumberOfDaysInPeriodForService_Discount_NumberOfDays_7_When_Counting_Working_Days_In_Period_Test()
+        public void PriceCalculateService_CalculateNumberOfDiscountedDaysInPeriodForService_Discount_NumberOfDays_7_When_Counting_Working_Days_In_Period_Test()
         {
             // Arrange
             // expected
@@ -156,7 +156,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, true);
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, true);
 
             // Assert
             Assert.AreEqual(iExpectedNumberOfDays, iActualNumberOfDays);
@@ -167,7 +167,7 @@ namespace NUnit_PricingCalculator_TestProject
         /// Test kontrollerar att vi får tillbaka korrekt antal dagar för en rabatt period. Då räknar vi bara arbetsdagar dvs ej lördag och söndag
         /// </summary>
         [Test]
-        public void PriceCalculateService_CalculateNumberOfDaysInPeriodForService_Discount_NumberOfDays_2_When_Counting_Working_Days_In_Period_Test()
+        public void PriceCalculateService_CalculateNumberOfDiscountedDaysInPeriodForService_Discount_NumberOfDays_2_When_Counting_Working_Days_In_Period_Test()
         {
             // Arrange
             // expected
@@ -184,12 +184,12 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, true);
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, true);
 
             // Assert
             Assert.AreEqual(iExpectedNumberOfDays, iActualNumberOfDays);
         }
 
-        #endregion // End of region Test av metoden CalculateNumberOfDaysInPeriodForService
+        #endregion // End of region Test av metoden CalculateNumberOfDiscountedDaysInPeriodForService
     }
 }

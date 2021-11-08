@@ -60,47 +60,146 @@ namespace PricingCalculator.Services
 
             double dblCost = 0.0;
 
-            if (service == CallingService.SERVICE_A)
-            {// Service A = € 0,2 / working day (monday-friday)
-
-                try
-                {
-                    dblCost = CalculatePriceForServiceA(customer, dtStartDate, dtEndDate);
-                }
-                catch
-                {
-                    throw;
-                }
-
+            try
+            {
+                // Service A = € 0,2 / working day (monday-friday)
+                // Service B = € 0,24 / working day (monday-friday)
+                // Service C = € 0,4 / day (monday-sunday)
+                dblCost = CalculatePriceForService(customer, service, dtStartDate, dtEndDate);
             }
-            else if (service == CallingService.SERVICE_B)
-            {// Service B = € 0,24 / working day (monday-friday)
-
-                try
-                {
-                    dblCost = CalculatePriceForServiceB(customer, dtStartDate, dtEndDate);
-                }
-                catch
-                {
-                    throw;
-                }
-            }
-            else if (service == CallingService.SERVICE_C)
-            {// Service C = € 0,4 / day (monday-sunday)
-
-                try
-                {
-                    dblCost = CalculatePriceForServiceC(customer, dtStartDate, dtEndDate);
-                }
-                catch
-                {
-                    throw;
-                }
+            catch
+            {
+                throw;
             }
 
             return dblCost;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <param name="callingService"></param>
+        /// <param name="dtStartDate"></param>
+        /// <param name="dtEndDate"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
+        /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
+        /// <exception cref="System.ArgumentException">Anropande Service är inte satt dvs. service == CallingService.NA</exception>
+        /// <exception cref="InvalidServiceBaseCostInAppsettingsException">Kastas om ServiceBaseCost data i Appsettings.json inte är korrekt</exception>
+        public double CalculatePriceForService(Customer customer, CallingService callingService, DateTime dtStartDate, DateTime dtEndDate)
+        {
+            if (customer == null)
+                throw new ArgumentNullException("PriceCalculateService->CalculatePriceForService(). Referensen till customer är null");
+
+            if (dtStartDate > dtEndDate)
+                throw new ArgumentException("PriceCalculateService->CalculatePriceForService(). StartDatum är inte före slutdatum");
+
+            if (callingService == CallingService.NA)
+                throw new ArgumentException("PriceCalculateService->CalculatePriceForService(). Anropande Service är inte satt");
+
+
+            double dblCost = 0.0;
+            double dblBaseCost = 0.0;
+
+            CostForService costForService = null;
+            Discount discount = null;
+            string strConfigValue = String.Empty;
+            bool bCountAllDaysInTheWeek = false;
+            int iDays = 0;
+
+            if (callingService == CallingService.SERVICE_A)
+            {
+                discount = customer.DiscountForServiceA;
+                costForService = customer.CostForServiceA;
+                strConfigValue = "ServiceBaseCost:ServiceA";
+                bCountAllDaysInTheWeek = false;
+                // Vi räknar bara arbetsdagar dvs måndag till fredag
+                iDays = CalculateNumberOfWorkDaysForService(dtStartDate, dtEndDate);
+            }
+            else if (callingService == CallingService.SERVICE_B)
+            {
+                discount = customer.DiscountForServiceB; 
+                costForService = customer.CostForServiceB;
+                strConfigValue = "ServiceBaseCost:ServiceB";
+                bCountAllDaysInTheWeek = false;
+                // Vi räknar bara arbetsdagar dvs måndag till fredag
+                iDays = CalculateNumberOfWorkDaysForService(dtStartDate, dtEndDate);
+            }
+            else if (callingService == CallingService.SERVICE_C)
+            {
+                discount = customer.DiscountForServiceC;
+                costForService = customer.CostForServiceC;
+                strConfigValue = "ServiceBaseCost:ServiceC";
+                bCountAllDaysInTheWeek = true;
+                // Vi räknar alla veckans dagar
+                iDays = (dtEndDate.Date - dtStartDate.Date).Days;
+                iDays++;
+            }
+
+
+            // Hämta baskostnaden för att använda servicen
+            if (costForService.HasItsOwnCostForService)
+            {
+                dblBaseCost = costForService.Cost;
+            }
+            else
+            {// Vi hämtar baskostnaden från appsettings.json filen
+                string strServiceBaseCost = m_Config.GetValue<string>(strConfigValue);
+                bool bBaseCostIsValid = Double.TryParse(strServiceBaseCost, out dblBaseCost);
+
+                if (bBaseCostIsValid == false || String.IsNullOrWhiteSpace(strServiceBaseCost))
+                    throw new InvalidServiceBaseCostInAppsettingsException("PriceCalculateService->CalculatePriceForService(). ServiceBaseCost:Service isnt valid");
+            }
+
+            if (customer.HasFreeDays)
+                iDays = iDays - customer.NumberOfFreeDays;
+
+            if (iDays <= 0)// Vi har inga dagar som vi ska beräkna kostnader för
+                return dblCost;
+
+
+            dblCost = dblBaseCost * Double.Parse(iDays.ToString());
+
+            if (discount.HasDiscount)
+            {// Kunden har rabatt på service a
+
+                if (discount.HasDiscountForAPeriod)
+                {// Kunden har rabatt under en period
+
+                    // Kontrollera hur många av dagarna som är inom perioden
+                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, callingService, dtStartDate, dtEndDate, bCountAllDaysInTheWeek);
+
+                    if (iNumberDiscountedOfDaysInPeriod > 0)
+                    {// Kunden har rabatt för några dagar
+
+                        // Rabatterad kostnad
+                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberDiscountedOfDaysInPeriod).ToString());
+                        dblCostWithDiscount = dblCostWithDiscount * (double)(1.0 - (double)(discount.DiscountInPercent / Double.Parse("100,0")));
+
+                        if (iDays > iNumberDiscountedOfDaysInPeriod)
+                        {// Det finns dagar som kunden inte skall ha rabatt för
+
+                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberDiscountedOfDaysInPeriod).ToString());
+                            dblCost = dblCostWithDiscount + dblCostNoDiscount;
+                        }
+                        else
+                        {
+                            dblCost = dblCostWithDiscount;
+                        }
+                    }
+                    // Om kunden inte har rabatt under en period, så har vi redan beräknat kostnaden
+                }
+                else
+                {// Kunden har alltid rabatt
+
+                    dblCost = dblCost * (double)(1.0 - (double)(discount.DiscountInPercent / Double.Parse("100,0")));
+                }
+            }
+
+            return dblCost;
+        }
 
         /// <summary>
         /// Metoden beräknar kostnaden för att använda service A
@@ -112,7 +211,7 @@ namespace PricingCalculator.Services
         /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
         /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
         /// <exception cref="System.ArgumentException">Anropande Service till metoden CalculateNumberOfDaysInPeriodForService är inte satt dvs. callingService == CallingService.NA</exception>
-        public double CalculatePriceForServiceA(Customer customer, DateTime dtStartDate, DateTime dtEndDate)
+        private double CalculatePriceForServiceA(Customer customer, DateTime dtStartDate, DateTime dtEndDate)
         {
             if (customer == null)
                 throw new ArgumentNullException("PriceCalculateService->CalculatePriceForServiceA(). Referensen till customer är null");
@@ -158,19 +257,19 @@ namespace PricingCalculator.Services
                 {// Kunden har rabatt under en period
 
                     // Kontrollera hur många av dagarna som är inom perioden
-                    int iNumberOfDaysInPeriod = CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, true);
+                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, true);
 
-                    if (iNumberOfDaysInPeriod > 0)
+                    if (iNumberDiscountedOfDaysInPeriod > 0)
                     {// Kunden har rabatt för några dagar
 
                         // Rabatterad kostnad
-                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberOfDaysInPeriod).ToString());
+                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberDiscountedOfDaysInPeriod).ToString());
                         dblCostWithDiscount = dblCostWithDiscount * (double)(1.0 - (double)(customer.DiscountForServiceA.DiscountInPercent / Double.Parse("100,0")));
 
-                        if (iDays > iNumberOfDaysInPeriod)
+                        if (iDays > iNumberDiscountedOfDaysInPeriod)
                         {// Det finns dagar som kunden inte skall ha rabatt för
 
-                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberOfDaysInPeriod).ToString());
+                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberDiscountedOfDaysInPeriod).ToString());
                             dblCost = dblCostWithDiscount + dblCostNoDiscount;
                         }
                         else
@@ -201,7 +300,7 @@ namespace PricingCalculator.Services
         /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
         /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
         /// <exception cref="System.ArgumentException">Anropande Service till metoden CalculateNumberOfDaysInPeriodForService är inte satt dvs. callingService == CallingService.NA</exception>
-        public double CalculatePriceForServiceB(Customer customer, DateTime dtStartDate, DateTime dtEndDate)
+        private double CalculatePriceForServiceB(Customer customer, DateTime dtStartDate, DateTime dtEndDate)
         {
             if (customer == null)
                 throw new ArgumentNullException("PriceCalculateService->CalculatePriceForServiceB(). Referensen till customer är null");
@@ -248,19 +347,19 @@ namespace PricingCalculator.Services
                 {// Kunden har rabatt under en period
 
                     // Kontrollera hur många av dagarna som är inom perioden
-                    int iNumberOfDaysInPeriod = CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_B, dtStartDate, dtEndDate, true);
+                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_B, dtStartDate, dtEndDate, true);
 
-                    if (iNumberOfDaysInPeriod > 0)
+                    if (iNumberDiscountedOfDaysInPeriod > 0)
                     {// Kunden har rabatt för några dagar
 
                         // Rabatterad kostnad
-                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberOfDaysInPeriod).ToString());
+                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberDiscountedOfDaysInPeriod).ToString());
                         dblCostWithDiscount = dblCostWithDiscount * (double)(1.0 - (double)(customer.DiscountForServiceB.DiscountInPercent / Double.Parse("100,0")));
 
-                        if (iDays > iNumberOfDaysInPeriod)
+                        if (iDays > iNumberDiscountedOfDaysInPeriod)
                         {// Det finns dagar som kunden inte skall ha rabatt för
 
-                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberOfDaysInPeriod).ToString());
+                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberDiscountedOfDaysInPeriod).ToString());
                             dblCost = dblCostWithDiscount + dblCostNoDiscount;
                         }
                         else
@@ -283,6 +382,7 @@ namespace PricingCalculator.Services
 
         /// <summary>
         /// Metoden beräknar kostnaden för att använda service c
+        /// Service C tar betalt för alla dagar i veckan
         /// </summary>
         /// <param name="customer">Customer som vill använda service</param>
         /// <param name="dtStartDate">Startdatum för användningen av service</param>
@@ -291,7 +391,7 @@ namespace PricingCalculator.Services
         /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
         /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
         /// <exception cref="System.ArgumentException">Anropande Service till metoden CalculateNumberOfDaysInPeriodForService är inte satt dvs. callingService == CallingService.NA</exception>
-        public double CalculatePriceForServiceC(Customer customer, DateTime dtStartDate, DateTime dtEndDate)
+        private double CalculatePriceForServiceC(Customer customer, DateTime dtStartDate, DateTime dtEndDate)
         {
             if (customer == null)
                 throw new ArgumentNullException("PriceCalculateService->CalculatePriceForServiceC(). Referensen till customer är null");
@@ -336,19 +436,19 @@ namespace PricingCalculator.Services
                 {// Kunden har rabatt under en period
 
                     // Kontrollera hur många av dagarna som är inom perioden
-                    int iNumberOfDaysInPeriod = CalculateNumberOfDaysInPeriodForService(customer, CallingService.SERVICE_C, dtStartDate, dtEndDate, false);
+                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_C, dtStartDate, dtEndDate, false);
 
-                    if (iNumberOfDaysInPeriod > 0)
+                    if (iNumberDiscountedOfDaysInPeriod > 0)
                     {// Kunden har rabatt för några dagar
 
                         // Rabatterad kostnad
-                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberOfDaysInPeriod).ToString());
+                        double dblCostWithDiscount = dblBaseCost * Double.Parse((iNumberDiscountedOfDaysInPeriod).ToString());
                         dblCostWithDiscount = dblCostWithDiscount * (double)(1.0 - (double)(customer.DiscountForServiceC.DiscountInPercent / Double.Parse("100,0")));
 
-                        if (iDays > iNumberOfDaysInPeriod)
+                        if (iDays > iNumberDiscountedOfDaysInPeriod)
                         {// Det finns dagar som kunden inte skall ha rabatt för
 
-                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberOfDaysInPeriod).ToString());
+                            double dblCostNoDiscount = dblBaseCost * Double.Parse((iDays - iNumberDiscountedOfDaysInPeriod).ToString());
                             dblCost = dblCostWithDiscount + dblCostNoDiscount;
                         }
                         else
@@ -412,16 +512,16 @@ namespace PricingCalculator.Services
         /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
         /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
         /// <exception cref="System.ArgumentException">Anropande Service är inte satt dvs. callingService == CallingService.NA</exception>
-        public int CalculateNumberOfDaysInPeriodForService(Customer customer, CallingService callingService, DateTime dtStartDate, DateTime dtEndDate, bool bOnlyWeekDays = false)
+        public int CalculateNumberOfDiscountedDaysInPeriodForService(Customer customer, CallingService callingService, DateTime dtStartDate, DateTime dtEndDate, bool bOnlyWeekDays = false)
         {
             if (customer == null)
-                throw new ArgumentNullException("PriceCalculateService->CalculateNumberOfDaysInPeriodForService(). Referensen till customer är null");
+                throw new ArgumentNullException("PriceCalculateService->CalculateNumberOfDiscountedDaysInPeriodForService(). Referensen till customer är null");
 
             if (dtStartDate > dtEndDate)
-                throw new ArgumentException("PriceCalculateService->CalculateNumberOfDaysInPeriodForService(). StartDatum är inte före slutdatum");
+                throw new ArgumentException("PriceCalculateService->CalculateNumberOfDiscountedDaysInPeriodForService(). StartDatum är inte före slutdatum");
 
             if (callingService == CallingService.NA)
-                throw new ArgumentException("PriceCalculateService->CalculateNumberOfDaysInPeriodForService(). Anropande Service är inte satt");
+                throw new ArgumentException("PriceCalculateService->CalculateNumberOfDiscountedDaysInPeriodForService(). Anropande Service är inte satt");
 
 
             int iNumberOfDays = 0;
