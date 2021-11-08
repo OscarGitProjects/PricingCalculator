@@ -426,7 +426,7 @@ namespace PricingCalculator.Services
 
             int iNumberOfDays = 0;
 
-            // Hämta uppgifter om evenuella rabatter
+            // Hämta uppgifter om eventuella rabatter
             Discount discount = null;
             if (callingService == CallingService.SERVICE_A)
                 discount = customer.DiscountForServiceA;
@@ -440,13 +440,7 @@ namespace PricingCalculator.Services
                 if ((discount.StartDate.Date >= dtStartDate.Date && discount.StartDate.Date <= dtEndDate) ||
                     (discount.EndDate.Date >= dtStartDate && discount.EndDate.Date <= dtEndDate))
                 {// Rabattens Startdate är inom intervallet eller Rabattens Slutdate är inom intervallet
-
-                    //int iDays = 0;
-
-                    //if (discount.StartDate.Date == discount.EndDate.Date)
-                    //    iDays = 1;
-                    //else
-                        
+   
                     int iDays = (discount.EndDate.Date - discount.StartDate.Date).Days;
                     iDays++;
 

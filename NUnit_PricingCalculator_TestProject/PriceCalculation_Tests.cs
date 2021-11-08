@@ -114,7 +114,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected  
             Customer customer = new Customer(1, "Test ett");
-            DateTime dtStartDate = DateTime.Now.AddDays(-2);
+            DateTime dtStartDate = DateTime.Now.AddDays(-1);
             DateTime dtEndDate = DateTime.Now;
             customer.DiscountForServiceC = new Discount();
             //customer.DiscountInPercentForServiceC = 0.0;
@@ -138,7 +138,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected  
             Customer customer = new Customer(1, "Test ett");
-            DateTime dtStartDate = DateTime.Now.AddDays(-2);
+            DateTime dtStartDate = DateTime.Now.AddDays(-1);
             DateTime dtEndDate = DateTime.Now;
             customer.DiscountForServiceC = new Discount();
             //customer.DiscountInPercentForServiceC = 0.0;
@@ -162,7 +162,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected  
             Customer customer = new Customer(1, "Test ett");
-            DateTime dtStartDate = DateTime.Now.AddDays(-2);
+            DateTime dtStartDate = DateTime.Now.AddDays(-1);
             DateTime dtEndDate = DateTime.Now;
             customer.DiscountForServiceC = new Discount();
             //customer.DiscountInPercentForServiceC = 0.0;
@@ -212,7 +212,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected  
             Customer customer = new Customer(1, "Test ett");
-            DateTime dtStartDate = DateTime.Now.AddDays(-2);
+            DateTime dtStartDate = DateTime.Now.AddDays(-1);
             DateTime dtEndDate = DateTime.Now;
             
             Discount discount = new Discount();
@@ -240,7 +240,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected  
             Customer customer = new Customer(1, "Test ett");
-            DateTime dtStartDate = DateTime.Now.AddDays(-2);
+            DateTime dtStartDate = DateTime.Now.AddDays(-1);
             DateTime dtEndDate = DateTime.Now;
 
             Discount discount = new Discount();
@@ -344,5 +344,12 @@ namespace NUnit_PricingCalculator_TestProject
         }
 
         #endregion // End of Region Test av metoden CalculateNumberOfWorkDaysForService
+
+
+        #region Test av metoden CalculateNumberOfDaysInPeriodForService
+
+        // TODO
+
+        #endregion // End of region Test av metoden CalculateNumberOfDaysInPeriodForService
     }
 }
