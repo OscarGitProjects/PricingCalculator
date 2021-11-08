@@ -435,7 +435,7 @@ namespace PricingCalculator.Services
             else if (callingService == CallingService.SERVICE_C)
                 discount = customer.DiscountForServiceC;
 
-            if (discount != null)
+            if (discount != null && discount.HasDiscount && discount.HasDiscountForAPeriod)
             {
                 if ((discount.StartDate.Date >= dtStartDate.Date && discount.StartDate.Date <= dtEndDate) ||
                     (discount.EndDate.Date >= dtStartDate && discount.EndDate.Date <= dtEndDate))
