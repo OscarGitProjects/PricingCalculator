@@ -36,7 +36,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            Assert.Throws<ArgumentNullException>(() => this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
+            Assert.Throws<ArgumentNullException>(() => this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate));
 
             // Assert
         }
@@ -56,27 +56,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
-
-            // Assert
-        }
-
-
-        /// <summary>
-        /// Test kontrollerra att ArgumentException kastas om CallingService är satt till CallingService.NA
-        /// </summary>
-        [Test]
-        public void PriceCalculateService_CalculateNumberOfDiscountedDaysInPeriodForService_CallingService_Not_Set_Test()
-        {
-            // Arrange
-            // expected
-            Customer customer = new Customer(1, "Test 1");
-            DateTime dtStartDate = DateTime.Now.AddDays(-1);
-            DateTime dtEndDate = DateTime.Now;
-
-            // Act
-            // actual
-            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.NA, dtStartDate, dtEndDate));
+            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate));
 
             // Assert
         }
@@ -91,6 +71,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
+            customer.CallingService = CallingService.SERVICE_A;
             customer.DiscountForServiceA.HasDiscount = false;
             customer.DiscountForServiceA.HasDiscountForAPeriod = false;
             DateTime dtStartDate = DateTime.Now.AddDays(-1);
@@ -100,7 +81,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate);
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate);
 
             // Assert
             Assert.AreEqual(iExpectedNumberOfDays, iActualNumberOfDays);
@@ -116,6 +97,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
+            customer.CallingService = CallingService.SERVICE_A;
             customer.DiscountForServiceA.HasDiscount = true;
             customer.DiscountForServiceA.HasDiscountForAPeriod = true;
             customer.DiscountForServiceA.StartDate = new DateTime(2021, 11, 06);
@@ -128,7 +110,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, false);
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate, false);
 
             // Assert
             Assert.AreEqual(iExpectedNumberOfDays, iActualNumberOfDays);
@@ -144,6 +126,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
+            customer.CallingService = CallingService.SERVICE_A;
             customer.DiscountForServiceA.HasDiscount = true;
             customer.DiscountForServiceA.HasDiscountForAPeriod = true;
             customer.DiscountForServiceA.StartDate = new DateTime(2021, 11, 06);
@@ -156,7 +139,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, true);
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate, true);
 
             // Assert
             Assert.AreEqual(iExpectedNumberOfDays, iActualNumberOfDays);
@@ -172,6 +155,7 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
+            customer.CallingService = CallingService.SERVICE_A;
             customer.DiscountForServiceA.HasDiscount = true;
             customer.DiscountForServiceA.HasDiscountForAPeriod = true;
             customer.DiscountForServiceA.StartDate = new DateTime(2021, 11, 06);
@@ -184,7 +168,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, CallingService.SERVICE_A, dtStartDate, dtEndDate, true);
+            int iActualNumberOfDays = this.m_PriceCalculateService.CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate, true);
 
             // Assert
             Assert.AreEqual(iExpectedNumberOfDays, iActualNumberOfDays);

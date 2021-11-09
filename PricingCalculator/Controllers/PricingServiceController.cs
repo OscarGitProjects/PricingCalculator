@@ -55,7 +55,8 @@ namespace PricingCalculator.Controllers
 
             if (customer.CanUseServiceA)
             {
-                double price = m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_A, customer, startDate, endDate);
+                customer.CallingService = CallingService.SERVICE_A;
+                double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
                 return Ok(price.ToString());
             }
             else
@@ -85,7 +86,8 @@ namespace PricingCalculator.Controllers
 
             if (customer.CanUseServiceB)
             {
-                double price = m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_B, customer, startDate, endDate);
+                customer.CallingService = CallingService.SERVICE_B;
+                double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
                 return Ok(price.ToString());
             }
             else
@@ -115,7 +117,8 @@ namespace PricingCalculator.Controllers
 
             if (customer.CanUseServiceC)
             {
-                double price = m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_C, customer, startDate, endDate);
+                customer.CallingService = CallingService.SERVICE_C;
+                double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
                 return Ok(price.ToString());
             }
             else

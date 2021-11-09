@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PricingCalculator.Services;
+using System;
 using System.Text;
 
 namespace PricingCalculator.Models
@@ -24,6 +25,56 @@ namespace PricingCalculator.Models
         public CostForService CostForServiceC { get; set; }
 
         public int NumberOfFreeDays { get; set; }
+
+        public CallingService CallingService { get; set; } = CallingService.NA;
+
+        public Discount GetDiscount()
+        {
+            if (CallingService == CallingService.SERVICE_A)
+                return this.DiscountForServiceA;
+            else if (CallingService == CallingService.SERVICE_B)
+                return this.DiscountForServiceB;
+            else if (CallingService == CallingService.SERVICE_C)
+                return this.DiscountForServiceC;
+
+            return null;
+        }
+
+        public CostForService GetCostForService()
+        {
+            if (CallingService == CallingService.SERVICE_A)
+                return this.CostForServiceA;
+            else if (CallingService == CallingService.SERVICE_B)
+                return this.CostForServiceB;
+            else if (CallingService == CallingService.SERVICE_C)
+                return this.CostForServiceC;
+
+            return null;
+        }
+
+        public string GetConfigValueString()
+        {
+            if (CallingService == CallingService.SERVICE_A)
+                return "ServiceBaseCost:ServiceA";
+            else if (CallingService == CallingService.SERVICE_B)
+                return "ServiceBaseCost:ServiceB";
+            else if (CallingService == CallingService.SERVICE_C)
+                return "ServiceBaseCost:ServiceC";
+
+            return String.Empty;
+        }
+
+        public bool OnlyWorkingDays()
+        {
+            if (CallingService == CallingService.SERVICE_A)
+                return true;
+            else if (CallingService == CallingService.SERVICE_B)
+                return true;
+            else if (CallingService == CallingService.SERVICE_C)
+                return false;
+
+            return false;
+        }
 
         /// <summary>
         /// Property som returnerar true om användaren har några gratis dagar
