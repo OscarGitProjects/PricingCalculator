@@ -106,7 +106,7 @@ namespace PricingCalculator.Services
             CostForService costForService = null;
             Discount discount = null;
             string strConfigValue = String.Empty;
-            bool bCountAllDaysInTheWeek = false;
+            bool bOnlyWeekDays = false;
             int iDays = 0;
 
             if (callingService == CallingService.SERVICE_A)
@@ -114,7 +114,7 @@ namespace PricingCalculator.Services
                 discount = customer.DiscountForServiceA;
                 costForService = customer.CostForServiceA;
                 strConfigValue = "ServiceBaseCost:ServiceA";
-                bCountAllDaysInTheWeek = false;
+                bOnlyWeekDays = true;
                 // Vi räknar bara arbetsdagar dvs måndag till fredag
                 iDays = CalculateNumberOfWorkDaysForService(dtStartDate, dtEndDate);
             }
@@ -123,7 +123,7 @@ namespace PricingCalculator.Services
                 discount = customer.DiscountForServiceB; 
                 costForService = customer.CostForServiceB;
                 strConfigValue = "ServiceBaseCost:ServiceB";
-                bCountAllDaysInTheWeek = false;
+                bOnlyWeekDays = true;
                 // Vi räknar bara arbetsdagar dvs måndag till fredag
                 iDays = CalculateNumberOfWorkDaysForService(dtStartDate, dtEndDate);
             }
@@ -132,7 +132,7 @@ namespace PricingCalculator.Services
                 discount = customer.DiscountForServiceC;
                 costForService = customer.CostForServiceC;
                 strConfigValue = "ServiceBaseCost:ServiceC";
-                bCountAllDaysInTheWeek = true;
+                bOnlyWeekDays = false;
                 // Vi räknar alla veckans dagar
                 iDays = (dtEndDate.Date - dtStartDate.Date).Days;
                 iDays++;
@@ -169,7 +169,7 @@ namespace PricingCalculator.Services
                 {// Kunden har rabatt under en period
 
                     // Kontrollera hur många av dagarna som är inom perioden
-                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, callingService, dtStartDate, dtEndDate, bCountAllDaysInTheWeek);
+                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, callingService, dtStartDate, dtEndDate, bOnlyWeekDays);
 
                     if (iNumberDiscountedOfDaysInPeriod > 0)
                     {// Kunden har rabatt för några dagar

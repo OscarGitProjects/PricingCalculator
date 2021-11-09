@@ -244,9 +244,9 @@ namespace NUnit_PricingCalculator_TestProject
             double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(customer, CallingService.SERVICE_C, dtStartDate, dtEndDate);
 
             // Assert
-            double dblExpectedCost1 = dblExpectedCost * (double)(1 - (double)(customer.DiscountForServiceC.DiscountInPercent / Double.Parse("100,0")));
+            double dblExpectedCost1 = (3 * dblExpectedCost) * (double)(1 - (double)(customer.DiscountForServiceC.DiscountInPercent / Double.Parse("100,0")));
 
-            Assert.AreEqual(3 * dblExpectedCost1 + 3 * dblExpectedCost, dblActualCost);
+            Assert.AreEqual(dblExpectedCost1 + 3 * dblExpectedCost, dblActualCost);
         }
 
         #endregion  // End region Test av metoden CalculatePriceForService med pris från appsettings.json filen med rabatt
