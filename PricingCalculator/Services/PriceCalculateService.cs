@@ -97,10 +97,10 @@ namespace PricingCalculator.Services
             CostForService costForService = customer.GetCostForService();
             Discount discount = customer.GetDiscount();
             string strConfigValue = customer.GetConfigValueString();
-            bool bOnlyWeekDays = customer.OnlyWorkingDays();
+            bool bOnlyWorkingDays = customer.OnlyWorkingDays();
             int iDays = 0;
 
-            if(bOnlyWeekDays)
+            if(bOnlyWorkingDays)
             {
                 // Vi räknar bara arbetsdagar dvs måndag till fredag
                 iDays = CalculateNumberOfWorkDaysForService(dtStartDate, dtEndDate);
@@ -172,7 +172,7 @@ namespace PricingCalculator.Services
                 {// Kunden har rabatt under en period
 
                     // Kontrollera hur många av dagarna som är inom perioden
-                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate, bOnlyWeekDays);
+                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate, bOnlyWorkingDays);
 
                     if (iNumberDiscountedOfDaysInPeriod > 0)
                     {// Kunden har rabatt för några dagar

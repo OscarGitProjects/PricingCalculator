@@ -28,6 +28,11 @@ namespace PricingCalculator.Models
 
         public CallingService CallingService { get; set; } = CallingService.NA;
 
+        /// <summary>
+        /// Metoden returnerar objekt med rabatt för användning av vald Service
+        /// Vald service sätts med CallingService
+        /// </summary>
+        /// <returns>Discount objekt</returns>
         public Discount GetDiscount()
         {
             if (CallingService == CallingService.SERVICE_A)
@@ -40,6 +45,11 @@ namespace PricingCalculator.Models
             return null;
         }
 
+        /// <summary>
+        /// Metoden returnera objekt med kostnaden för att använda en vald service
+        /// Vald service sätts med CallingService
+        /// </summary>
+        /// <returns>CostForService objekt</returns>
         public CostForService GetCostForService()
         {
             if (CallingService == CallingService.SERVICE_A)
@@ -52,6 +62,12 @@ namespace PricingCalculator.Models
             return null;
         }
 
+
+        /// <summary>
+        /// Metoden returnera den string med vilket json element man skall hämta från appsettings.json filen
+        /// Vald service sätts med CallingService
+        /// </summary>
+        /// <returns>json element som skall hämtas från appsettings.json</returns>
         public string GetConfigValueString()
         {
             if (CallingService == CallingService.SERVICE_A)
@@ -64,6 +80,13 @@ namespace PricingCalculator.Models
             return String.Empty;
         }
 
+
+        /// <summary>
+        /// true om vi bara skall ta betalt för arbetsdagar. Annars retruneras false
+        /// Vilket som skall användas beror på vilken service som används
+        /// Vald service sätts med CallingService
+        /// </summary>
+        /// <returns>true om vi bara skall ta betalt för arbetsdagar. Annars retruneras false</returns>
         public bool OnlyWorkingDays()
         {
             if (CallingService == CallingService.SERVICE_A)
@@ -75,6 +98,7 @@ namespace PricingCalculator.Models
 
             return false;
         }
+
 
         /// <summary>
         /// Property som returnerar true om användaren har några gratis dagar
@@ -159,6 +183,18 @@ namespace PricingCalculator.Models
             StartDateServiceC = DateTime.Now.AddYears(1);
 
             NumberOfFreeDays = 0;
+        }
+
+
+        /// <summary>
+        /// Konstruktor
+        /// </summary>
+        /// <param name="iCustomerId">CustomerId</param>
+        /// <param name="strCustomerName">CustomerName</param>
+        /// <param name="callingService">Vilken service är det som skall användas</param>
+        public Customer(int iCustomerId, string strCustomerName, CallingService callingService) : this(iCustomerId, strCustomerName)
+        {
+            this.CallingService = callingService;
         }
 
 
