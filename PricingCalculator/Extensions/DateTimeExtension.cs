@@ -24,7 +24,7 @@ namespace PricingCalculator.Extensions
 
 
         /// <summary>
-        /// Metoden kontrollerar att datumets veckodag, dvs DateTime.Now.Day, är inom intervallet dtStartDate och dtEndDate. 
+        /// Metoden kontrollerar att datumet, dvs DateTime.Now.Date, är inom intervallet dtStartDate och dtEndDate. 
         /// Inkluderar dtStartDate och dtEndDate
         /// </summary>
         /// <param name="dtDate">Datum som vi vill kontrollera om det är inom intervallet</param>
@@ -35,7 +35,7 @@ namespace PricingCalculator.Extensions
         {            
             bool bIsInRange = false;
 
-            if (dtDate.Day >= dtStartDate.Day && dtDate.Day <= dtEndDate.Day)
+            if (dtDate.Date >= dtStartDate.Date && dtDate.Date <= dtEndDate.Date)
                 bIsInRange = true;
 
             return bIsInRange;

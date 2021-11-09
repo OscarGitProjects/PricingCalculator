@@ -32,7 +32,7 @@ namespace PricingCalculator.Models
         /// Metoden returnerar objekt med rabatt för användning av vald Service
         /// Vald service sätts med CallingService
         /// </summary>
-        /// <returns>Discount objekt</returns>
+        /// <returns>Discount objekt. Om service inte är vald returneras null</returns>
         public Discount GetDiscount()
         {
             if (CallingService == CallingService.SERVICE_A)
@@ -49,7 +49,7 @@ namespace PricingCalculator.Models
         /// Metoden returnera objekt med kostnaden för att använda en vald service
         /// Vald service sätts med CallingService
         /// </summary>
-        /// <returns>CostForService objekt</returns>
+        /// <returns>CostForService objekt. Om service inte är vald returneras null</returns>
         public CostForService GetCostForService()
         {
             if (CallingService == CallingService.SERVICE_A)
@@ -67,7 +67,7 @@ namespace PricingCalculator.Models
         /// Metoden returnera den string med vilket json element man skall hämta från appsettings.json filen
         /// Vald service sätts med CallingService
         /// </summary>
-        /// <returns>json element som skall hämtas från appsettings.json</returns>
+        /// <returns>json element som skall hämtas från appsettings.json. Om service inte är vald returneras en tom sträng</returns>
         public string GetConfigValueString()
         {
             if (CallingService == CallingService.SERVICE_A)
@@ -86,7 +86,7 @@ namespace PricingCalculator.Models
         /// Vilket som skall användas beror på vilken service som används
         /// Vald service sätts med CallingService
         /// </summary>
-        /// <returns>true om vi bara skall ta betalt för arbetsdagar. Annars retruneras false</returns>
+        /// <returns>true om vi bara skall ta betalt för arbetsdagar. Annars retruneras false. Om service inte är vald returneras false</returns>
         public bool OnlyWorkingDays()
         {
             if (CallingService == CallingService.SERVICE_A)
@@ -112,6 +112,25 @@ namespace PricingCalculator.Models
                 return false;
             }
         }
+
+
+        /// <summary>
+        /// Anropas för att se om customer får använda vald service
+        /// Vald service sätts med CallingService
+        /// </summary>
+        /// <returns>true om det går att använda vald service. Annars returneras false</returns>
+        public bool CanUseService()
+        {
+            if (CallingService == CallingService.SERVICE_A)
+                return CanUseServiceA;
+            else if (CallingService == CallingService.SERVICE_B)
+                return CanUseServiceB;
+            else if (CallingService == CallingService.SERVICE_C)
+                return CanUseServiceC;
+
+            return false;
+        }
+
 
         /// <summary>
         /// Property som returnerar true om användaren kan använda service a
@@ -178,9 +197,9 @@ namespace PricingCalculator.Models
             CostForServiceB = new CostForService();
             CostForServiceC = new CostForService();
 
-            StartDateServiceA = DateTime.Now.AddYears(1);
-            StartDateServiceB = DateTime.Now.AddYears(1);
-            StartDateServiceC = DateTime.Now.AddYears(1);
+            StartDateServiceA = DateTime.Now.AddYears(-100);
+            StartDateServiceB = DateTime.Now.AddYears(-100);
+            StartDateServiceC = DateTime.Now.AddYears(-100);
 
             NumberOfFreeDays = 0;
         }
@@ -203,7 +222,7 @@ namespace PricingCalculator.Models
             StringBuilder strBuild = new StringBuilder();
             strBuild.AppendLine($"CustomerId: {CustomerId}, CustomerName: {CustomerName}");
 
-            strBuild.AppendLine($"NumberOfFreeDays: {NumberOfFreeDays}");
+            strBuild.AppendLine($"NumberOfFreeDays: {NumberOfFreeDays}, CallingService: {CallingService}");
 
             strBuild.AppendLine($"StartDateServiceA: {StartDateServiceA.ToShortDateString()}, StartDateServiceB: {StartDateServiceB.ToShortDateString()}, StartDateServiceC: {StartDateServiceC.ToShortDateString()}");
 

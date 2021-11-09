@@ -5,6 +5,6 @@ namespace PricingCalculator.Services
     public interface ICustomerService
     {
         Customer GetCustomer(int iCustomerId);
-        void CreateCustomers(int iNumberOfCustomers);
+        void CreateCustomers();
     }
 }

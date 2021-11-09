@@ -48,14 +48,15 @@ namespace PricingCalculator.Controllers
         [HttpGet("ServiceA/{customerId}/{startDate}/{endDate}")]
         public async Task<ActionResult<string>> ServiceA(int customerId, DateTime startDate, DateTime endDate)
         {
-            m_CustomerService.CreateCustomers(5);
+            m_CustomerService.CreateCustomers();
             Customer customer = m_CustomerService.GetCustomer(customerId);
             if (customer == null)
                 return NotFound($"Hittade inte customer med id {customerId}");
 
-            if (customer.CanUseServiceA)
-            {
-                customer.CallingService = CallingService.SERVICE_A;
+            customer.CallingService = CallingService.SERVICE_A;
+
+            if (customer.CanUseService())
+            {                
                 double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
                 return Ok(price.ToString());
             }
@@ -79,14 +80,15 @@ namespace PricingCalculator.Controllers
         [HttpGet("ServiceB/{customerId}/{startDate}/{endDate}")]
         public async Task<ActionResult<string>> ServiceB(int customerId, DateTime startDate, DateTime endDate)
         {
-            m_CustomerService.CreateCustomers(5);
+            m_CustomerService.CreateCustomers();
             Customer customer = m_CustomerService.GetCustomer(customerId);
             if (customer == null)
                 return NotFound($"Hittade inte customer med id {customerId}");
 
-            if (customer.CanUseServiceB)
-            {
-                customer.CallingService = CallingService.SERVICE_B;
+            customer.CallingService = CallingService.SERVICE_B;
+
+            if (customer.CanUseService())
+            {                
                 double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
                 return Ok(price.ToString());
             }
@@ -110,14 +112,15 @@ namespace PricingCalculator.Controllers
         [HttpGet("ServiceC/{customerId}/{startDate}/{endDate}")]
         public async Task<ActionResult<string>> ServiceC(int customerId, DateTime startDate, DateTime endDate)
         {
-            m_CustomerService.CreateCustomers(5);
+            m_CustomerService.CreateCustomers();
             Customer customer = m_CustomerService.GetCustomer(customerId);
             if (customer == null)
                 return NotFound($"Hittade inte customer med id {customerId}");
 
-            if (customer.CanUseServiceC)
-            {
-                customer.CallingService = CallingService.SERVICE_C;
+            customer.CallingService = CallingService.SERVICE_C;
+
+            if (customer.CanUseService())
+            {                
                 double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
                 return Ok(price.ToString());
             }
