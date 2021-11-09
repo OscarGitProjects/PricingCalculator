@@ -78,9 +78,9 @@ namespace NUnit_PricingCalculator_TestProject
             double dblExpectedCost = 123.0;
             customer.CostForServiceB.Cost = dblExpectedCost;
             customer.CostForServiceB.HasItsOwnCostForService = true;
-
-            DateTime dtStartDate = DateTime.Now;
-            DateTime dtEndDate = DateTime.Now.AddDays(2);
+           
+            DateTime dtStartDate = new DateTime(2021, 11, 08);
+            DateTime dtEndDate = dtStartDate.AddDays(2);
 
             // Act
             // actual
@@ -105,8 +105,9 @@ namespace NUnit_PricingCalculator_TestProject
             customer.CostForServiceB.HasItsOwnCostForService = true;
             customer.NumberOfFreeDays = 1;
 
-            DateTime dtStartDate = DateTime.Now;
-            DateTime dtEndDate = DateTime.Now.AddDays(2);
+            DateTime dtStartDate = new DateTime(2021, 11, 08);
+            DateTime dtEndDate = dtStartDate.AddDays(2);
+
 
             // Act
             // actual
@@ -130,8 +131,8 @@ namespace NUnit_PricingCalculator_TestProject
             Customer customer = new Customer(1, "Test 1");
             double dblExpectedCost = 0.24;
 
-            DateTime dtStartDate = DateTime.Now;
-            DateTime dtEndDate = DateTime.Now.AddDays(2);
+            DateTime dtStartDate = new DateTime(2021, 11, 08);
+            DateTime dtEndDate = dtStartDate.AddDays(2);
 
             // Act
             // actual
@@ -154,8 +155,8 @@ namespace NUnit_PricingCalculator_TestProject
             double dblExpectedCost = 0.24;
             customer.NumberOfFreeDays = 1;
 
-            DateTime dtStartDate = DateTime.Now;
-            DateTime dtEndDate = DateTime.Now.AddDays(2);
+            DateTime dtStartDate = new DateTime(2021, 11, 08);
+            DateTime dtEndDate = dtStartDate.AddDays(2);
 
             // Act
             // actual
@@ -182,7 +183,7 @@ namespace NUnit_PricingCalculator_TestProject
             customer.DiscountForServiceB.DiscountInPercent = 10.0;
             double dblExpectedCost = 0.24;
             DateTime dtStartDate = DateTime.Now;
-            DateTime dtEndDate = DateTime.Now;
+            DateTime dtEndDate = dtStartDate;
 
             // Act
             // actual
@@ -206,8 +207,9 @@ namespace NUnit_PricingCalculator_TestProject
             customer.DiscountForServiceB.HasDiscount = true;
             customer.DiscountForServiceB.DiscountInPercent = 10.0;
             double dblExpectedCost = 0.24;
-            DateTime dtStartDate = DateTime.Now;
-            DateTime dtEndDate = DateTime.Now.AddDays(1);
+
+            DateTime dtStartDate = new DateTime(2021, 11, 08);
+            DateTime dtEndDate = dtStartDate.AddDays(1);
 
             // Act
             // actual
