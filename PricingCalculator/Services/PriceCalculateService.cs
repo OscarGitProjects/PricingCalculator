@@ -166,7 +166,7 @@ namespace PricingCalculator.Services
             dblCost = dblBaseCost * Double.Parse(iDays.ToString());
 
             if (discount.HasDiscount)
-            {// Kunden har rabatt på service a
+            {// Kunden har rabatt på service
 
                 if (discount.HasDiscountForAPeriod)
                 {// Kunden har rabatt under en period

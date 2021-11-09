@@ -25,7 +25,7 @@ namespace PricingCalculator.Services
         }
 
         /// <summary>
-        /// Metoden två kunder. Customer X och Customer Y
+        /// Metoden skapar två kunder. Customer X och Customer Y
         /// </summary>
         public void CreateCustomers()
         {
