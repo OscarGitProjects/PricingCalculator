@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using PricingCalculator.Exceptions;
 using PricingCalculator.Extensions;
+using PricingCalculator.Handlers;
 using PricingCalculator.Models;
 using System;
 //using System.Runtime.CompilerServices;
@@ -24,19 +25,23 @@ namespace PricingCalculator.Services
     public class PriceCalculateService : IPriceCalculateService
     {
         private readonly IConfiguration m_Config;
+        private readonly ICustomerHandler m_CustomerHandler;
 
         /// <summary>
         /// Konstruktor
         /// </summary>
-        /// <param name="config"></param>
-        public PriceCalculateService(IConfiguration config)
+        /// <param name="config">Referens till ett objekt där mankan hämta konfigurationer</param>
+        /// <param name="customerHandler">Referens till ett objekt där man kan hämta information från ett customer objekt</param>
+        public PriceCalculateService(IConfiguration config, ICustomerHandler customerHandler)
         {
             this.m_Config = config;
+            this.m_CustomerHandler = customerHandler;
         }
 
         /// <summary>
         /// Metoden beräknar kostnaden
         /// </summary>
+        /// <param name="callingService">Information om vilken service som vi skall beräkna kostnaden för</param>
         /// <param name="customer">Customer objekt med information</param>
         /// <param name="dtStartDate">Startdatum</param>
         /// <param name="dtEndDate">Slutdatum</param>
@@ -44,7 +49,7 @@ namespace PricingCalculator.Services
         /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
         /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
         /// <exception cref="InvalidServiceBaseCostInAppsettingsException">Kastas om ServiceBaseCost data i Appsettings.json inte är korrekt</exception>
-        public double CalculatePrice(Customer customer, DateTime dtStartDate, DateTime dtEndDate)
+        public double CalculatePrice(CallingService callingService, Customer customer, DateTime dtStartDate, DateTime dtEndDate)
         {
             if (customer == null)
                 throw new ArgumentNullException("PriceCalculateService->CalculatePrice(). Referensen till customer är null");
@@ -60,7 +65,7 @@ namespace PricingCalculator.Services
                 // Service A = € 0,2 / working day (monday-friday)
                 // Service B = € 0,24 / working day (monday-friday)
                 // Service C = € 0,4 / day (monday-sunday)
-                dblCost = CalculatePriceForService(customer, dtStartDate, dtEndDate);
+                dblCost = CalculatePriceForService(callingService, customer, dtStartDate, dtEndDate);
             }
             catch
             {
@@ -74,6 +79,7 @@ namespace PricingCalculator.Services
         /// <summary>
         /// Metoden beräknar kostnaden för att använda en tjänst under en period som är angiven av startdatum och slutdatum
         /// </summary>
+        /// <param name="callingService">Information om vilken service som vi skall beräkna kostnaden för</param>
         /// <param name="customer">Customer som vill använda service</param>
         /// <param name="callingService">Anropande service</param>
         /// <param name="dtStartDate">Startdatum för användningen av service</param>
@@ -82,7 +88,7 @@ namespace PricingCalculator.Services
         /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
         /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
         /// <exception cref="InvalidServiceBaseCostInAppsettingsException">Kastas om ServiceBaseCost data i Appsettings.json inte är korrekt</exception>
-        public double CalculatePriceForService(Customer customer, DateTime dtStartDate, DateTime dtEndDate)
+        public double CalculatePriceForService(CallingService callingService, Customer customer, DateTime dtStartDate, DateTime dtEndDate)
         {
             if (customer == null)
                 throw new ArgumentNullException("PriceCalculateService->CalculatePriceForService(). Referensen till customer är null");
@@ -94,10 +100,11 @@ namespace PricingCalculator.Services
             double dblCost = 0.0;
             double dblBaseCost = 0.0;
 
-            CostForService costForService = customer.GetCostForService();
-            Discount discount = customer.GetDiscount();
-            string strConfigValue = customer.GetConfigValueString();
-            bool bOnlyWorkingDays = customer.OnlyWorkingDays();
+            
+            CostForService costForService = m_CustomerHandler.GetCostForService(callingService, customer); 
+            Discount discount = m_CustomerHandler.GetDiscount(callingService, customer); 
+            string strConfigValue = m_CustomerHandler.GetConfigValueString(callingService, customer); 
+            bool bOnlyWorkingDays = m_CustomerHandler.OnlyWorkingDays(callingService, customer); 
             int iDays = 0;
 
             if(bOnlyWorkingDays)
@@ -172,7 +179,7 @@ namespace PricingCalculator.Services
                 {// Kunden har rabatt under en period
 
                     // Kontrollera hur många av dagarna som är inom perioden
-                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(customer, dtStartDate, dtEndDate, bOnlyWorkingDays);
+                    int iNumberDiscountedOfDaysInPeriod = CalculateNumberOfDiscountedDaysInPeriodForService(callingService, customer, dtStartDate, dtEndDate, bOnlyWorkingDays);
 
                     if (iNumberDiscountedOfDaysInPeriod > 0)
                     {// Kunden har rabatt för några dagar
@@ -239,6 +246,7 @@ namespace PricingCalculator.Services
         /// <summary>
         /// Kontrollera hur många av dagarna som är inom perioden för rabatt. Den perioden finns i customer objektet
         /// </summary>
+        /// <param name="callingService">Information om vilken service som vi skall beräkna kostnaden för</param>
         /// <param name="customer">Customer</param>
         /// <param name="dtStartDate">Startdatum</param>
         /// <param name="dtEndDate">Slutdatum</param>
@@ -246,7 +254,7 @@ namespace PricingCalculator.Services
         /// <returns></returns>
         /// <exception cref="System.ArgumentNullException">Undantaget kastas om referensen till Customer objektet är null</exception>
         /// <exception cref="System.ArgumentException">StartDatum inte är före slutdatum</exception>
-        public int CalculateNumberOfDiscountedDaysInPeriodForService(Customer customer, DateTime dtStartDate, DateTime dtEndDate, bool bOnlyWeekDays = false)
+        public int CalculateNumberOfDiscountedDaysInPeriodForService(CallingService callingService, Customer customer, DateTime dtStartDate, DateTime dtEndDate, bool bOnlyWeekDays = false)
         {
             if (customer == null)
                 throw new ArgumentNullException("PriceCalculateService->CalculateNumberOfDiscountedDaysInPeriodForService(). Referensen till customer är null");
@@ -258,13 +266,7 @@ namespace PricingCalculator.Services
             int iNumberOfDays = 0;
 
             // Hämta uppgifter om eventuella rabatter
-            Discount discount = customer.GetDiscount();
-            //if (callingService == CallingService.SERVICE_A)
-            //    discount = customer.DiscountForServiceA;
-            //else if (callingService == CallingService.SERVICE_B)
-            //    discount = customer.DiscountForServiceB;
-            //else if (callingService == CallingService.SERVICE_C)
-            //    discount = customer.DiscountForServiceC;
+            Discount discount = m_CustomerHandler.GetDiscount(callingService, customer); //customer.GetDiscount();           
 
             if (discount != null && discount.HasDiscount && discount.HasDiscountForAPeriod)
             {

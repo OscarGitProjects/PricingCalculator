@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PricingCalculator.Handlers;
 using PricingCalculator.Models;
 using PricingCalculator.Services;
 using System;
@@ -23,16 +24,23 @@ namespace PricingCalculator.Controllers
         /// </summary>
         private readonly IPriceCalculateService m_PriceCalculateService;
 
+        /// <summary>
+        /// Referens till ett objekt där man kan hämta information från ett customer objekt
+        /// </summary>
+        private readonly ICustomerHandler m_CustomerHandler;
+
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="customerService">Referens till en service där man hämtar information om en customer</param>
         /// <param name="priceCalculateService">Referens till en service där man beräknar kostnaden</param>
-        public PricingServiceController(ICustomerService customerService, IPriceCalculateService priceCalculateService)
+        /// <param name="customerHandler">Referens till ett objekt där man kan hämta information från ett customer objekt</param>
+        public PricingServiceController(ICustomerService customerService, IPriceCalculateService priceCalculateService, ICustomerHandler customerHandler)
         {
             this.m_CustomerService = customerService;
             this.m_PriceCalculateService = priceCalculateService;
+            this.m_CustomerHandler = customerHandler;
         }
 
         /// <summary>
@@ -53,11 +61,10 @@ namespace PricingCalculator.Controllers
             if (customer == null)
                 return NotFound($"Hittade inte customer med id {customerId}");
 
-            customer.CallingService = CallingService.SERVICE_A;
 
-            if (customer.CanUseService())
+            if (m_CustomerHandler.CanUseService(CallingService.SERVICE_A, customer))
             {                
-                double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
+                double price = m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_A, customer, startDate, endDate);
                 return Ok(price.ToString());
             }
             else
@@ -85,11 +92,10 @@ namespace PricingCalculator.Controllers
             if (customer == null)
                 return NotFound($"Hittade inte customer med id {customerId}");
 
-            customer.CallingService = CallingService.SERVICE_B;
 
-            if (customer.CanUseService())
+            if (m_CustomerHandler.CanUseService(CallingService.SERVICE_B, customer))
             {                
-                double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
+                double price = m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_B, customer, startDate, endDate);
                 return Ok(price.ToString());
             }
             else
@@ -117,11 +123,10 @@ namespace PricingCalculator.Controllers
             if (customer == null)
                 return NotFound($"Hittade inte customer med id {customerId}");
 
-            customer.CallingService = CallingService.SERVICE_C;
 
-            if (customer.CanUseService())
+            if (m_CustomerHandler.CanUseService(CallingService.SERVICE_C, customer))
             {                
-                double price = m_PriceCalculateService.CalculatePrice(customer, startDate, endDate);
+                double price = m_PriceCalculateService.CalculatePrice(CallingService.SERVICE_C, customer, startDate, endDate);
                 return Ok(price.ToString());
             }
             else

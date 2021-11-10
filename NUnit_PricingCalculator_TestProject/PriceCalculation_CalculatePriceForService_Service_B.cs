@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using PricingCalculator.Handlers;
 using PricingCalculator.Models;
 using PricingCalculator.Services;
 using System;
@@ -11,7 +12,7 @@ namespace NUnit_PricingCalculator_TestProject
         public void TestSetup()
         {
             var test = this.BuildConfiguration(TestContext.CurrentContext.TestDirectory);
-            this.m_PriceCalculateService = new PriceCalculateService(this.BuildConfiguration(TestContext.CurrentContext.TestDirectory));
+            this.m_PriceCalculateService = new PriceCalculateService(this.BuildConfiguration(TestContext.CurrentContext.TestDirectory), new CustomerHandler());
         }
 
 
@@ -37,7 +38,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            Assert.Throws<ArgumentNullException>(() => this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate));
+            Assert.Throws<ArgumentNullException>(() => this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate));
 
             // Assert
         }
@@ -52,13 +53,12 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
-            customer.CallingService = CallingService.SERVICE_B;
             DateTime dtStartDate = DateTime.Now.AddDays(1);
             DateTime dtEndDate = DateTime.Now;
 
             // Act
             // actual
-            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate));
+            Assert.Throws<ArgumentException>(() => this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate));
 
             // Assert
         }
@@ -76,7 +76,6 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
-            customer.CallingService = CallingService.SERVICE_B;
             double dblExpectedCost = 123.0;
             customer.CostForServiceB.Cost = dblExpectedCost;
             customer.CostForServiceB.HasItsOwnCostForService = true;
@@ -86,7 +85,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate);
+            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate);
 
             // Assert
             Assert.AreEqual(3 * dblExpectedCost, dblActualCost);
@@ -102,7 +101,6 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
-            customer.CallingService = CallingService.SERVICE_B;
             double dblExpectedCost = 123.0;
             customer.CostForServiceB.Cost = dblExpectedCost;
             customer.CostForServiceB.HasItsOwnCostForService = true;
@@ -114,7 +112,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate);
+            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate);
 
             // Assert
             Assert.AreEqual(2 * dblExpectedCost, dblActualCost);
@@ -132,7 +130,6 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
-            customer.CallingService = CallingService.SERVICE_B;
             double dblExpectedCost = 0.24;
 
             DateTime dtStartDate = new DateTime(2021, 11, 08);
@@ -140,7 +137,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate);
+            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate);
 
             // Assert
             Assert.AreEqual(3 * dblExpectedCost, dblActualCost);
@@ -156,7 +153,6 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
-            customer.CallingService = CallingService.SERVICE_B;
             double dblExpectedCost = 0.24;
             customer.NumberOfFreeDays = 1;
 
@@ -165,7 +161,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate);
+            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate);
 
             // Assert
             Assert.AreEqual(2 * dblExpectedCost, dblActualCost);
@@ -184,7 +180,6 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
-            customer.CallingService = CallingService.SERVICE_B;
             customer.DiscountForServiceB.HasDiscount = true;
             customer.DiscountForServiceB.DiscountInPercent = 10.0;
             double dblExpectedCost = 0.24;
@@ -193,7 +188,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate);
+            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate);
 
             // Assert
             double dblExpectedCost1 = dblExpectedCost * (1 - (double)(customer.DiscountForServiceB.DiscountInPercent / Double.Parse("100,0")));
@@ -210,7 +205,6 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
-            customer.CallingService = CallingService.SERVICE_B;
             customer.DiscountForServiceB.HasDiscount = true;
             customer.DiscountForServiceB.DiscountInPercent = 10.0;
             double dblExpectedCost = 0.24;
@@ -220,7 +214,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate);
+            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate);
 
             // Assert
             double dblExpectedCost1 = dblExpectedCost * (double)(1 - (double)(customer.DiscountForServiceB.DiscountInPercent / Double.Parse("100,0")));
@@ -237,7 +231,6 @@ namespace NUnit_PricingCalculator_TestProject
             // Arrange
             // expected
             Customer customer = new Customer(1, "Test 1");
-            customer.CallingService = CallingService.SERVICE_B;
             customer.DiscountForServiceB.HasDiscount = true;
             customer.DiscountForServiceB.DiscountInPercent = 10.0;
 
@@ -251,7 +244,7 @@ namespace NUnit_PricingCalculator_TestProject
 
             // Act
             // actual
-            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(customer, dtStartDate, dtEndDate);
+            double dblActualCost = this.m_PriceCalculateService.CalculatePriceForService(CallingService.SERVICE_B, customer, dtStartDate, dtEndDate);
 
             // Assert
             double dblExpectedCost1 = dblExpectedCost * (double)(1 - (double)(customer.DiscountForServiceB.DiscountInPercent / Double.Parse("100,0")));

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using PricingCalculator.Handlers;
 using PricingCalculator.Repository;
 using PricingCalculator.Services;
 using System;
@@ -40,7 +41,9 @@ namespace PricingCalculator
 
             services.AddSingleton<ICustomerService, CustomerService>();
 
-            services.AddSingleton<ICustomerRepository, CustomerRepository>();            
+            services.AddSingleton<ICustomerRepository, CustomerRepository>();
+
+            services.AddSingleton<ICustomerHandler, CustomerHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,5 +1,4 @@
-﻿using PricingCalculator.Services;
-using System;
+﻿using System;
 using System.Text;
 
 namespace PricingCalculator.Models
@@ -26,79 +25,6 @@ namespace PricingCalculator.Models
 
         public int NumberOfFreeDays { get; set; }
 
-        public CallingService CallingService { get; set; } = CallingService.NA;
-
-        /// <summary>
-        /// Metoden returnerar objekt med rabatt för användning av vald Service
-        /// Vald service sätts med CallingService
-        /// </summary>
-        /// <returns>Discount objekt. Om service inte är vald returneras null</returns>
-        public Discount GetDiscount()
-        {
-            if (CallingService == CallingService.SERVICE_A)
-                return this.DiscountForServiceA;
-            else if (CallingService == CallingService.SERVICE_B)
-                return this.DiscountForServiceB;
-            else if (CallingService == CallingService.SERVICE_C)
-                return this.DiscountForServiceC;
-
-            return null;
-        }
-
-        /// <summary>
-        /// Metoden returnera objekt med kostnaden för att använda en vald service
-        /// Vald service sätts med CallingService
-        /// </summary>
-        /// <returns>CostForService objekt. Om service inte är vald returneras null</returns>
-        public CostForService GetCostForService()
-        {
-            if (CallingService == CallingService.SERVICE_A)
-                return this.CostForServiceA;
-            else if (CallingService == CallingService.SERVICE_B)
-                return this.CostForServiceB;
-            else if (CallingService == CallingService.SERVICE_C)
-                return this.CostForServiceC;
-
-            return null;
-        }
-
-
-        /// <summary>
-        /// Metoden returnera den string med vilket json element man skall hämta från appsettings.json filen
-        /// Vald service sätts med CallingService
-        /// </summary>
-        /// <returns>json element som skall hämtas från appsettings.json. Om service inte är vald returneras en tom sträng</returns>
-        public string GetConfigValueString()
-        {
-            if (CallingService == CallingService.SERVICE_A)
-                return "ServiceBaseCost:ServiceA";
-            else if (CallingService == CallingService.SERVICE_B)
-                return "ServiceBaseCost:ServiceB";
-            else if (CallingService == CallingService.SERVICE_C)
-                return "ServiceBaseCost:ServiceC";
-
-            return String.Empty;
-        }
-
-
-        /// <summary>
-        /// true om vi bara skall ta betalt för arbetsdagar. Annars retruneras false
-        /// Vilket som skall användas beror på vilken service som används
-        /// Vald service sätts med CallingService
-        /// </summary>
-        /// <returns>true om vi bara skall ta betalt för arbetsdagar. Annars retruneras false. Om service inte är vald returneras false</returns>
-        public bool OnlyWorkingDays()
-        {
-            if (CallingService == CallingService.SERVICE_A)
-                return true;
-            else if (CallingService == CallingService.SERVICE_B)
-                return true;
-            else if (CallingService == CallingService.SERVICE_C)
-                return false;
-
-            return false;
-        }
-
 
         /// <summary>
         /// Property som returnerar true om användaren har några gratis dagar
@@ -111,24 +37,6 @@ namespace PricingCalculator.Models
 
                 return false;
             }
-        }
-
-
-        /// <summary>
-        /// Anropas för att se om customer får använda vald service
-        /// Vald service sätts med CallingService
-        /// </summary>
-        /// <returns>true om det går att använda vald service. Annars returneras false</returns>
-        public bool CanUseService()
-        {
-            if (CallingService == CallingService.SERVICE_A)
-                return CanUseServiceA;
-            else if (CallingService == CallingService.SERVICE_B)
-                return CanUseServiceB;
-            else if (CallingService == CallingService.SERVICE_C)
-                return CanUseServiceC;
-
-            return false;
         }
 
 
@@ -205,24 +113,12 @@ namespace PricingCalculator.Models
         }
 
 
-        /// <summary>
-        /// Konstruktor
-        /// </summary>
-        /// <param name="iCustomerId">CustomerId</param>
-        /// <param name="strCustomerName">CustomerName</param>
-        /// <param name="callingService">Vilken service är det som skall användas</param>
-        public Customer(int iCustomerId, string strCustomerName, CallingService callingService) : this(iCustomerId, strCustomerName)
-        {
-            this.CallingService = callingService;
-        }
-
-
         public override string ToString()
         {
             StringBuilder strBuild = new StringBuilder();
             strBuild.AppendLine($"CustomerId: {CustomerId}, CustomerName: {CustomerName}");
 
-            strBuild.AppendLine($"NumberOfFreeDays: {NumberOfFreeDays}, CallingService: {CallingService}");
+            strBuild.AppendLine($"NumberOfFreeDays: {NumberOfFreeDays}");
 
             strBuild.AppendLine($"StartDateServiceA: {StartDateServiceA.ToShortDateString()}, StartDateServiceB: {StartDateServiceB.ToShortDateString()}, StartDateServiceC: {StartDateServiceC.ToShortDateString()}");
 

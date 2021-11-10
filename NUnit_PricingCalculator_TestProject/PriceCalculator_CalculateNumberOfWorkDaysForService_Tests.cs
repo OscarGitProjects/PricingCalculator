@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using PricingCalculator.Handlers;
 using PricingCalculator.Services;
 using System;
 
@@ -10,7 +11,7 @@ namespace NUnit_PricingCalculator_TestProject
         public void TestSetup()
         {
             var test = this.BuildConfiguration(TestContext.CurrentContext.TestDirectory);
-            this.m_PriceCalculateService = new PriceCalculateService(this.BuildConfiguration(TestContext.CurrentContext.TestDirectory));
+            this.m_PriceCalculateService = new PriceCalculateService(this.BuildConfiguration(TestContext.CurrentContext.TestDirectory), new CustomerHandler());
         }
 
         [SetUp]
